@@ -6,9 +6,9 @@ import numpy as np
 
 def autoregressive_analysis_appliances():
     """
-    +--------------+
-    | Assignment 1 |
-    +--------------+
+    +----------------+
+    | Assignment 1.1 |
+    +----------------+
     
     Perform an autoregressive analysis of the “Appliances” column of the dataset 
     which measures the energy consumption of appliances across a period of 4.5 months. 
@@ -41,9 +41,9 @@ def autoregressive_analysis_appliances():
 
 def correlation_temperatures():
     """
-    +--------------+
-    | Assignment 2 |
-    +--------------+
+    +----------------+
+    | Assignment 1.2 |
+    +----------------+
     
     Perform a correlation analysis on the temperature data in the dataset 
     (i.e. the columns marked as Ti). It is  sufficient to pick up just one 
@@ -100,9 +100,9 @@ def correlation_temperatures():
 
 class SimplePitchDetector(object):
     """
-    +--------------+
-    | Assignment 3 |
-    +--------------+
+    +----------------+
+    | Assignment 1.3 |
+    +----------------+
     
     The autocorrelation is useful for finding repeated patterns in a signal. 
     For example, at short lags, the autocorrelation can tell us something about 
@@ -152,16 +152,3 @@ class SimplePitchDetector(object):
             pitches.append(pitch)
             max_rates.append(max(rates))
         return max_rates, pitches
-        
-
-
-
-
-
-
-
-
-
-
-
-

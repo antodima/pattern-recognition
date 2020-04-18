@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 
 def normalized_cut(image_path):
     """
-    +--------------+
-    | Assignment 4 |
-    +--------------+
+    +----------------+
+    | Assignment 1.4 |
+    +----------------+
     
     Perform image segmentation on one of the eight image thematic subsets. 
     Note that each file has a name starting with a number from 1 to 8, 
@@ -33,9 +33,9 @@ def normalized_cut(image_path):
 
 def sift_descriptor(image_path):
     """
-    +--------------+
-    | Assignment 5 |
-    +--------------+
+    +----------------+
+    | Assignment 1.5 |
+    +----------------+
     
     Select one image from each of the eight thematic subsets (see previous assignment), for a total of 8 images. 
     Extract the SIFT descriptors for the 8 images using the visual feature detector embedded in SIFT 

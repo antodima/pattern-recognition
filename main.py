@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 from pattern_recognition.signal_processing import SimplePitchDetector
 from pattern_recognition.image_processing import normalized_cut, sift_descriptor, sobel_filter
+from pattern_recognition.markov_models import gaussiam_hmm, lda
 import matplotlib.pyplot as plt
 
+"""
 #####################
 # signal processing #
 #####################
@@ -22,11 +24,19 @@ plt.show()
 
 from skimage.io import imshow
 fig = normalized_cut('datasets/msrc_data/1_1_s.bmp')
-imshow(fig)
+plt.imshow(fig)
 
 kp, sift_desc = sift_descriptor('datasets/msrc_data/1_1_s.bmp')
-imshow(sift_desc)
+plt.imshow(sift_desc)
 
 x, y = sobel_filter('datasets/msrc_data/6_7_s.bmp')
-imshow(x)
-imshow(y)
+plt.imshow(x)
+plt.imshow(y)
+
+
+pred_a, pred_l = gaussiam_hmm()
+plt.plot(pred_a)
+plt.plot(pred_l)
+plt.show()
+"""
+lda()
