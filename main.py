@@ -33,10 +33,13 @@ x, y = sobel_filter('datasets/msrc_data/6_7_s.bmp')
 plt.imshow(x)
 plt.imshow(y)
 
+#################
+# markov models #
+#################
 
 pred_a, pred_l = gaussiam_hmm()
 plt.plot(pred_a)
 plt.plot(pred_l)
 plt.show()
 """
-lda()
+lda_model = lda()

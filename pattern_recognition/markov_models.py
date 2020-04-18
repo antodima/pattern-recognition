@@ -150,8 +150,8 @@ def lda():
             # SIFT descriptor clusters model
             self.kmeans_train_model = None
             self.kmeans_test_model = None
-            model_train_filename = 'lda_kmeans_train.model'
-            model_test_filename = 'lda_kmeans_test.model'
+            model_train_filename = 'pattern_recognition/lda_kmeans_train.model'
+            model_test_filename = 'pattern_recognition/lda_kmeans_test.model'
             if os.path.isfile(model_train_filename):
                 print('Model train already exists')
                 self.kmeans_train_model = pickle.load(open(model_train_filename, 'rb'))
@@ -237,7 +237,7 @@ def lda():
     corpus = [dictionary.doc2bow(doc) for doc in vocabulary]
     
     lda_model = LdaModel(corpus, num_topics=num_topics)
-    
+    return lda_model
     
     
     
