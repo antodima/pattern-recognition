@@ -240,6 +240,126 @@ def lda():
     return lda_model
     
     
+def rbm():
+    """
+    +----------------+
+    | Assignment 2.3 |
+    +----------------+
+    
+    Implement from scratch an RBM and apply it to DSET3. The RBM should be implemented 
+    fully by you (both CD-1 training and inference steps) but you are free to use 
+    library functions for the rest (e.g. image loading and management, etc.).
+        1. Train an RBM with 100 hidden neurons (single layer) on the MNIST data 
+            (use the training set split provided by the website).
+        2. Use the trained RBM to encode all the images using the corresponding 
+            activation of the hidden neurons.
+        3. Train a simple classifier (e.g. any simple classifier in scikit) 
+            to recognize the MNIST digits using as inputs their encoding obtained at step 2.
+    """
+    import pattern_recognition.input_data as input_data
+    import tensorflow.compat.v1 as tf
+    tf.disable_v2_behavior()
+    import numpy as np
+    import math
+    
+    
+    class RBM(object):
+        def __init__(self, name, input_size, output_size):
+            with tf.name_scope("rbm_" + name):
+                self.weights = tf.Variable(tf.truncated_normal(
+                    [input_size, output_size], 
+                    stddev=1.0 / math.sqrt(float(input_size))), name="weights")
+                self.v_bias = tf.Variable(tf.zeros([input_size]), name="v_bias")
+                self.h_bias = tf.Variable(tf.zeros([output_size]), name="h_bias")
+    
+        def propup(self, visible):
+            return tf.nn.sigmoid(tf.matmul(visible, self.weights) + self.h_bias)
+    
+        def propdown(self, hidden):
+            return tf.nn.sigmoid(tf.matmul(hidden, tf.transpose(self.weights)) + self.v_bias)
+    
+        def sample_h_given_v(self, v_sample):
+            return self.sample_prob(self.propup(v_sample))
+    
+        def sample_v_given_h(self, h_sample):
+            return self.sample_prob(self.propdown(h_sample))
+    
+        def gibbs_hvh(self, h0_sample):
+            v_sample = self.sample_v_given_h(h0_sample)
+            h_sample = self.sample_h_given_v(v_sample)
+            return [v_sample, h_sample]
+    
+        def gibbs_vhv(self, v0_sample):
+            h_sample = self.sample_h_given_v(v0_sample)
+            v_sample = self.sample_v_given_h(h_sample)
+            return  [h_sample, v_sample]
+    
+        def cd1(self, visibles, learning_rate=0.1):
+            h_start = self.propup(visibles)
+            v_end = self.propdown(h_start)
+            h_end = self.propup(v_end)
+            w_positive_grad = tf.matmul(tf.transpose(visibles), h_start)
+            w_negative_grad = tf.matmul(tf.transpose(v_end), h_end)
+            update_w = self.weights.assign_add(learning_rate * (w_positive_grad - w_negative_grad))
+            update_vb = self.v_bias.assign_add(learning_rate * tf.reduce_mean(visibles - v_end, 0))
+            update_hb = self.h_bias.assign_add(learning_rate * tf.reduce_mean(h_start - h_end, 0))
+            return [update_w, update_vb, update_hb]
+    
+        def reconstruction_error(self, dataset):
+            err = tf.stop_gradient(dataset - self.gibbs_vhv(dataset)[1])
+            return tf.reduce_sum(err * err)
+
+        def sample_prob(probs):
+            return tf.nn.relu(tf.sign(probs - tf.random_uniform(probs.get_shape())))
+        
+        
+    def build_model(X, w1, b1, wo, bo):
+        h1 = tf.nn.sigmoid(tf.matmul(X, w1)+b1)
+        model = tf.nn.sigmoid(tf.matmul(h1, wo)+bo)
+        return model
+
+    def init_weight(shape):
+        return tf.Variable(tf.random_normal(shape, mean=0.0, stddev=0.01))
+    
+    def init_bias(dim):
+        return tf.Variable(tf.zeros([dim]))
+    
+    
+    mnist = input_data.read_data_sets("datasets/mnist_data/", one_hot=True)
+    trX, trY, teX, teY = mnist.train.images, mnist.train.labels, mnist.test.images, mnist.test.labels
+    
+    X = tf.placeholder("float", [None, 784])
+    Y = tf.placeholder("float", [None, 10])
+    rbm_layer = RBM("mnist", 784, 500)
+    trX_constant = tf.constant(trX)
+    for i in range(10):
+        rbm_layer.cd1(trX_constant)
+    
+    rbm_w, rbm_vb, rbm_hb = rbm_layer.cd1(trX)
+    wo = init_weight([500,10])
+    bo = init_bias(10)
+    py_x = build_model(X, rbm_w, rbm_hb, wo, bo)
+        
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=py_x, labels=Y))
+    train_op = tf.train.GradientDescentOptimizer(0.05).minimize(cost)
+    predict_op = tf.argmax(py_x, 1)
+    
+    sess = tf.InteractiveSession()
+    tf.global_variables_initializer().run()
+    
+    for i in range(10):
+        print('Epoch', i+1)
+        batch_xs, batch_ys = mnist.train.next_batch(100)
+        sess.run(train_op, feed_dict={X: batch_xs, Y: batch_ys})
+    
+    correct_prediction = tf.equal(tf.argmax(py_x,1), tf.argmax(Y,1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    val = sess.run(tf.argmax(py_x,1), feed_dict={X: mnist.test.images, Y: mnist.test.labels})
+    sess.close()
+    
+    
+    
+    
     
     
     
